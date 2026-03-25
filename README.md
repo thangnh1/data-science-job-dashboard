@@ -1,5 +1,7 @@
 # Claude Development Template
 
+![Claude Development Template](.assets/cover.png)
+
 A bootstrapping template for software projects built with [Claude Code](https://claude.ai/claude-code). Clone it, say **"START!"**, and Claude walks you through setting up all the documentation before a single line of code is written.
 
 ---
