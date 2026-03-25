@@ -2,7 +2,7 @@
 
 ![Claude Development Template](.assets/cover.png)
 
-A bootstrapping template for software projects built with [Claude Code](https://claude.ai/claude-code). Clone it, say **"START!"**, and Claude walks you through setting up all the documentation before a single line of code is written.
+A bootstrapping template for software projects built with [Claude Code](https://claude.ai/claude-code). Use it as a GitHub template, say **"START!"**, and Claude walks you through setting up all the documentation before a single line of code is written.
 
 ---
 
@@ -20,11 +20,14 @@ This repository is an opinionated project scaffold that gives Claude everything 
 
 ## How to Use
 
-### 1. Clone this repository into your new project
+### 1. Create a new repository from this template
+
+Click **"Use this template"** → **"Create a new repository"** on GitHub.
+
+Or with the GitHub CLI:
 
 ```bash
-git clone <this-repo-url> my-new-project
-cd my-new-project
+gh repo create my-project --template <this-repo> --private --clone && cd my-project
 ```
 
 ### 2. Open it in Claude Code and say "START!"
