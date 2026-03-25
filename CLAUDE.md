@@ -17,6 +17,7 @@ Delegate to specialist agents for focused work. Claude selects them automaticall
 
 | Agent | Role | Invoke when... |
 |-------|------|----------------|
+| `project-manager` | Backlog & coordination | "What's next?", sprint planning, breaking down features, reprioritizing |
 | `systems-architect` | Architecture & ADRs | New feature design, tech decisions, system integration |
 | `frontend-developer` | UI implementation | Components, pages, client-side state, styling |
 | `backend-developer` | API & business logic | Endpoints, auth, background jobs, integrations |
@@ -32,7 +33,7 @@ Delegate to specialist agents for focused work. Claude selects them automaticall
 These apply to all agents at all times. No exceptions without explicit human instruction.
 
 1. **PRD.md is read-only.** Never modify it. Read it to understand requirements.
-2. **TODO.md is human-curated.** Read it to suggest next steps. Never modify it without being asked.
+2. **TODO.md is the living backlog.** Agents may add items, mark items complete, and move items to "Completed". Preserve section order and existing item priority — do not reorder items within a section unless explicitly asked to reprioritize.
 3. **All commits use Conventional Commits format** (see Git Conventions below).
 4. **Update the relevant `docs/` file** after every significant change before marking a task complete.
 5. **Run tests before marking any implementation task complete.**
@@ -54,6 +55,7 @@ docs/
   user/USER_GUIDE.md    # User-facing documentation
   technical/            # Architecture, API, DB, decisions
 .claude/agents/         # Specialist agent definitions
+.tasks/                 # Detailed task files — one per TODO item (owned by @project-manager)
 ```
 
 ---

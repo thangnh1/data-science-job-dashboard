@@ -46,6 +46,7 @@ Once onboarding is complete, `START_HERE.md` is deleted and the project is ready
 ├── .gitignore
 │
 ├── .claude/agents/               # Specialist sub-agents
+│   ├── project-manager.md        # Backlog governance & agent coordination
 │   ├── systems-architect.md      # Architecture decisions & ADRs (Claude Opus)
 │   ├── frontend-developer.md     # UI components & pages
 │   ├── backend-developer.md      # API endpoints & business logic
@@ -56,6 +57,9 @@ Once onboarding is complete, `START_HERE.md` is deleted and the project is ready
 │
 ├── .github/
 │   └── PULL_REQUEST_TEMPLATE.md  # Enforces consistent PR descriptions
+│
+├── .tasks/                       # Detailed task files — one per TODO item
+│   └── TASK_TEMPLATE.md          # Copy this when creating new tasks
 │
 └── docs/
     ├── user/USER_GUIDE.md        # How the system is used (user perspective)
@@ -74,6 +78,7 @@ Each agent is a specialist Claude sub-agent with a defined role, document owners
 
 | Agent | Model | Responsibility | Owns |
 |-------|-------|----------------|------|
+| `project-manager` | Sonnet | Backlog governance, sprint planning, agent coordination | `TODO.md` |
 | `systems-architect` | Opus | High-level design, tech decisions, ADRs | `ARCHITECTURE.md`, `DECISIONS.md` |
 | `frontend-developer` | Sonnet | UI components, pages, client-side logic | Frontend section of `ARCHITECTURE.md` |
 | `backend-developer` | Sonnet | API endpoints, business logic, integrations | `API.md` |
