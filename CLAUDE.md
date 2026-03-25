@@ -25,6 +25,7 @@ Delegate to specialist agents for focused work. Claude selects them automaticall
 | `database-expert` | Schema & queries | Migrations, schema design, query optimization |
 | `qa-engineer` | Testing (Playwright) | E2E tests, test strategy, coverage gaps |
 | `documentation-writer` | Living docs | User guide updates, post-feature documentation |
+| `cicd-engineer` | CI/CD & GitHub Actions | Pipelines, deployments, branch protection, release automation |
 
 ---
 

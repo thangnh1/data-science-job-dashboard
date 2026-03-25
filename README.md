@@ -10,7 +10,7 @@ A bootstrapping template for software projects built with [Claude Code](https://
 
 This repository is an opinionated project scaffold that gives Claude everything it needs to act as a coherent development team from day one:
 
-- **Specialized agents** for each discipline (architecture, frontend, backend, design, database, QA, docs)
+- **Specialized agents** for each discipline (architecture, frontend, backend, design, database, QA, CI/CD, docs)
 - **Living documentation** that agents keep up to date as the project evolves
 - **Git conventions** enforced through commit format, branch naming, and PR templates
 - **A product requirements document** that serves as the authoritative source of truth — protected from accidental edits
@@ -58,7 +58,8 @@ Once onboarding is complete, `START_HERE.md` is deleted and the project is ready
 │   ├── ui-ux-designer.md         # UX flows & design system specs
 │   ├── database-expert.md        # Schema design & migrations
 │   ├── qa-engineer.md            # Playwright E2E tests
-│   └── documentation-writer.md  # User guide & project docs
+│   ├── documentation-writer.md  # User guide & project docs
+│   └── cicd-engineer.md         # GitHub Actions workflows & deployment pipelines
 │
 ├── .github/
 │   └── PULL_REQUEST_TEMPLATE.md  # Enforces consistent PR descriptions
@@ -91,6 +92,7 @@ Each agent is a specialist Claude sub-agent with a defined role, document owners
 | `database-expert` | Sonnet | Schema design, migrations, query optimization | `DATABASE.md` |
 | `qa-engineer` | Sonnet | Playwright E2E tests, test strategy | `tests/e2e/` |
 | `documentation-writer` | Haiku | User guide, README updates | `USER_GUIDE.md` |
+| `cicd-engineer` | Sonnet | GitHub Actions workflows, deployments, branch protection, release automation | `.github/workflows/`, `CICD.md` |
 
 Claude selects agents automatically based on context, or you can invoke them directly.
 
