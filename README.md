@@ -2,7 +2,7 @@
 
 ![Claude Development Template](.assets/cover.png)
 
-A bootstrapping template for software projects built with [Claude Code](https://claude.ai/claude-code). Use it as a GitHub template, say **"START!"**, and Claude walks you through setting up all the documentation before a single line of code is written.
+A bootstrapping template for software projects built with [Claude Code](https://claude.ai/claude-code). Use it as a GitHub template, run **`/start`**, and Claude walks you through setting up all the documentation before a single line of code is written.
 
 ---
 
@@ -30,7 +30,7 @@ Or with the GitHub CLI:
 gh repo create my-project --template <this-repo> --private --clone && cd my-project
 ```
 
-### 2. Open it in Claude Code and say "START!"
+### 2. Open it in Claude Code and run `/start`
 
 Claude will read `START_HERE.md` and begin the onboarding sequence — asking questions about your project and filling in all the documentation placeholders automatically.
 
