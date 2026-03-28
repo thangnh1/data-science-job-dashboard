@@ -44,6 +44,7 @@ These apply to all agents at all times. No exceptions without explicit human ins
 6. **Never hardcode secrets, credentials, or environment-specific values** in source code.
 7. **Consult `docs/technical/DECISIONS.md`** before proposing changes that may conflict with prior architectural decisions.
 8. **Always delegate to the right specialist.** If a task touches frontend, mobile (React Native), backend, database, UX/design, QA, documentation, CI/CD, Docker, or copy/SEO — invoke the appropriate agent immediately. Do not implement it yourself. The delegation table above is binding, not advisory.
+9. **Commit your own changes; never push.** After completing your work, create a local commit (Conventional Commits format). Do not `git push`. The orchestrator is responsible for pushing the branch and opening the PR.
 
 ---
 
@@ -96,6 +97,9 @@ refactor/<description>
 ```
 
 ### PR Requirements
+
+> **Workflow note:** Specialist agents commit locally; the orchestrator pushes and opens the PR.
+
 - PR title follows Conventional Commits format
 - Fill out `.github/PULL_REQUEST_TEMPLATE.md` completely — do not delete sections
 - Link to the related issue/ticket (`Closes #XXX`)
