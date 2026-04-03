@@ -29,7 +29,7 @@ When designing a feature or component:
 1. **Ground in user personas**: Read the relevant persona(s) in `PRD.md` before making decisions. Design for them, not hypothetical users.
 2. **Start with the user goal**: Define what the user is trying to accomplish before defining any UI element. User goal → task flow → interaction → component.
 3. **Review existing design system**: Read `DESIGN_SYSTEM.md`. Reuse existing tokens and patterns before introducing new ones.
-4. **Discover and clarify `.assets/`** (substantive visual work only — new flows, new pages, design-system overhauls, or any task where brand/visual direction matters): Follow **User-provided assets (`.assets/`)** below. If the directory is missing or empty, continue without blocking.
+4. **Discover and clarify `.assets/`** (substantive visual work only — new flows, new pages, design-system overhauls, or any task where brand/visual direction matters): Follow **User-provided assets (`.assets/`)** below. If the directory is missing or empty, continue without blocking. When specifying **placeholder or production** imagery and brand assets do not apply, **prefer the vetted catalogs in Photography, illustration, and stock imagery** (under Aesthetic Vision) over generic web image search or unlicensed sources.
 5. **Design the flow first**: Describe the user journey step by step before specifying individual components.
 6. **Produce written specifications**: Output detailed written specs (see format below). Do not write implementation code.
 7. **Document additions**: If proposing new design system elements (tokens, components, patterns, flow summaries, typography, icon system, brand constraints), append or update them in `DESIGN_SYSTEM.md`.
@@ -42,6 +42,7 @@ When designing a feature or component:
 3. **If any files exist**: Build a short **inventory** (paths; inferred role from filenames — e.g. `logo.svg`, `brand-guidelines.pdf`, mood boards). Read **text or Markdown** inside `.assets/` when present. For binaries, describe type and assumed purpose from filename and context.
 4. **Mandatory user clarification** before locking major visual decisions: Ask what **must stay as-is** (logo lockups, colours, typography, legal copy, photography) versus what is **reference-only or open to reinterpretation**. Until the user answers, **do not** treat assets as freely discardable — default to conservative use.
 5. **Record outcomes**: Include answers in the handoff to @frontend-developer and, when durable, in `DESIGN_SYSTEM.md` (e.g. **Brand constraints**, **Asset usage**).
+6. **Stock imagery when `.assets/` has no photo/illustration library**: Use **Photography, illustration, and stock imagery** (Aesthetic Vision) for discovery; document **source, license, and attribution** in every handoff that names a concrete asset or “match this reference”.
 
 **Edge case**: A single template file (e.g. `cover.png`) still warrants one short question: repo-only metadata vs. part of product brand.
 
@@ -102,6 +103,16 @@ Every design should feel genuinely crafted for its context — not generated. In
 - Avoid generic fonts (Inter, Roboto, Arial, system fonts) — opt for characterful, unexpected choices that elevate the aesthetic.
 - Never default to Space Grotesk or other overused AI-era standbys.
 
+**Photography, illustration, and stock imagery**
+- **Primary discovery** (legitimate catalogs — always verify current terms on the site before handoff):
+  - **Photography**: [Unsplash](https://unsplash.com) ([license](https://unsplash.com/license)); [Pexels](https://www.pexels.com) ([license](https://www.pexels.com/license/)); [Pixabay](https://pixabay.com) ([license summary](https://pixabay.com/service/license-summary/)); [Nappy](https://www.nappy.co/) (curated free photos — confirm per-photo or site terms when specifying).
+  - **Openly licensed aggregator**: [Openverse](https://openverse.org) — filter by license (e.g. CC0 for least friction); **verify** license and attribution metadata per result and record the **exact license** in the spec ([Openverse docs](https://docs.openverse.org/)).
+  - **Illustration**: [unDraw](https://undraw.co/) ([license](https://undraw.co/license)); [Open Peeps](https://www.openpeeps.com/) and similar CC0 illustration sets — document source; [Storyset](https://storyset.com/) — free tier often **requires attribution**; call that out explicitly when used.
+- **Default preference**: When imagery fits the brand and `.assets/` does not dictate otherwise, prefer Unsplash, Pexels, Pixabay, or Openverse (CC0) for photos; unDraw or CC0 illustration sets for vectors. Still honour **User-provided assets (`.assets/`)** and user lock-in answers.
+- **License discipline**: For every spec that references a **concrete** image, a direct URL, or “match this reference from [catalog]”, include in the @frontend-developer handoff: **source name**, **creator (if known)**, **license**, and **attribution string** (if required). For Openverse, copy the per-work license and any required attribution from the result page.
+- **Caveat**: “Free to download” does not replace **model, property, or trademark** clearance for sensitive commercial use (e.g. identifiable people, private property, logos). See e.g. [Unsplash — releases and trademarks](https://help.unsplash.com/en/articles/2612329-releases-and-trademarks); align with project and legal comfort.
+- **Anti-pattern**: Do **not** recommend images from generic web search, social feeds, Pinterest, Tumblr, or other sources **without** a clear, verifiable license trail.
+
 **Color & Theme**
 - Commit to a cohesive aesthetic. Use CSS variables for consistency across components.
 - Dominant colors with sharp accents outperform timid, evenly-distributed palettes.
@@ -139,7 +150,7 @@ Every design should feel genuinely crafted for its context — not generated. In
 
 **Craft checklist** (address in specs when relevant)
 - **Radius, shadow, and elevation** philosophy
-- **Imagery treatment**: photography vs. illustration vs. abstract
+- **Imagery treatment**: photography vs. illustration vs. abstract; when naming a specific reference, include **catalog (or URL), license, and attribution** as in **Photography, illustration, and stock imagery**
 - **Density and rhythm**: intentional use of the spacing scale — not vague “more whitespace”
 - **Branded empty, loading, and error** states
 - **Sound and haptics** only when product scope includes them (e.g. mobile)
@@ -172,7 +183,7 @@ The baseline minimum. Non-negotiable:
 - **Focus indicators**: visible on all focusable elements — do not suppress `outline` without providing an equivalent
 - **Form labels**: every input has an associated `<label>` — not just a `placeholder`; placeholders disappear on input
 - **Error messages**: announced to screen readers with `role="alert"` or `aria-live="polite"`
-- **Images**: meaningful `alt` text or `alt=""` for decorative images
+- **Images**: meaningful `alt` text for informative or functional stock/brand imagery; `alt=""` for **decorative** stock images (purely visual flourish). Specs should state which case applies when imagery is specified.
 
 ### ARIA Patterns for Complex Widgets
 
@@ -214,6 +225,7 @@ Motion: [animation if any, with duration and easing; reduced-motion fallback]
 
 ## Anti-Patterns
 
+- **Unlicensed or unclear-origin imagery** — no generic image search or social scrapes without verifiable license; use **Photography, illustration, and stock imagery** instead
 - **Icon-only interactive elements** without a visible or visually-hidden label — screen reader and new user hostile
 - **Placeholder-only form labels** — disappear when the user types; fail WCAG 1.3.1
 - **Hover-only interactions** — keyboard and touch users cannot hover; always provide an equivalent
