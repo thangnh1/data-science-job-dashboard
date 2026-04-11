@@ -17,17 +17,11 @@
 
 | Agent | Role | Invoke when... |
 |-------|------|----------------|
-| `project-manager` | Backlog & coordination | "What's next?", sprint planning, breaking down features, reprioritizing |
-| `systems-architect` | Architecture & ADRs | New feature design, tech decisions, system integration |
-| `frontend-developer` | UI implementation | Components, pages, client-side state, styling |
-| `backend-developer` | API & business logic | Endpoints, auth, background jobs, integrations |
-| `ui-ux-designer` | UX & design system | User flows, wireframes, component specs, accessibility |
-| `database-expert` | Schema & queries | Migrations, schema design, query optimization |
-| `qa-engineer` | Testing (Playwright) | E2E tests, test strategy, coverage gaps |
-| `documentation-writer` | Living docs | User guide updates, post-feature documentation |
-| `cicd-engineer` | CI/CD & GitHub Actions | Pipelines, deployments, branch protection, release automation |
-| `docker-expert` | Containerization | Dockerfiles, docker-compose, image optimization, container networking |
-| `copywriter-seo` | Copy & SEO | Landing page copy, marketing content, meta tags, keyword strategy, structured data specs, brand voice |
+| `planner` | Backlog & architecture | "What's next?", sprint planning, feature decomposition, tech decisions, ADRs, new feature design before implementation |
+| `builder` | All application code | Frontend components, backend endpoints, database schemas/migrations, React Native screens — specify domain in request |
+| `designer` | UX & content | User flows, wireframes, component specs, accessibility, landing copy, SEO, brand voice, marketing content |
+| `quality` | Testing & documentation | E2E tests, test strategy, coverage gaps, user guide updates, post-feature documentation |
+| `infra` | Infrastructure & pipelines | CI/CD workflows, deployments, Dockerfiles, docker-compose, container configuration |
 
 ---
 
@@ -42,9 +36,10 @@ These apply to all agents at all times. No exceptions without explicit human ins
 5. **Run tests before marking any implementation task complete.**
 6. **Never hardcode secrets, credentials, or environment-specific values** in source code.
 7. **Consult `docs/technical/DECISIONS.md`** before proposing changes that may conflict with prior architectural decisions.
-8. **Always delegate to the right specialist.** If a task touches frontend, mobile (React Native), backend, database, UX/design, QA, documentation, CI/CD, Docker, or copy/SEO — invoke the appropriate agent immediately. Do not implement it yourself. The delegation table above is binding, not advisory.
-9. **Design decisions precede implementation.** For any task involving visual appearance, interaction patterns, or UX choices — route to the `ui-ux-designer` first to produce a spec, then hand that spec to the `frontend-developer` to implement. The orchestrator must never specify CSS values, colors, or visual details itself.
+8. **Always delegate to the right specialist.** If a task touches application code (frontend, mobile, backend, or database), design/UX/content, testing/documentation, or infrastructure — invoke the appropriate agent (`builder`, `designer`, `quality`, or `infra`) immediately. Do not implement it yourself. The delegation table above is binding, not advisory.
+9. **Design decisions precede implementation.** For any task involving visual appearance, interaction patterns, or UX choices — route to the `designer` first to produce a spec, then hand that spec to the `builder` (frontend) to implement. The orchestrator must never specify CSS values, colors, or visual details itself.
 10. **Commit your own changes; never push.** After completing your work, create a local commit (Conventional Commits format). Do not `git push`. The orchestrator is responsible for pushing the branch and opening the PR.
+11. **When invoking `builder`, specify the domain in your request** (e.g. "frontend task — add dark mode toggle" or "database task — add index on orders table"). The builder reads the corresponding skill before starting work.
 
 ---
 
@@ -55,9 +50,6 @@ Use these commands to trigger common multi-step workflows:
 | Command | What it does |
 |---------|--------------|
 | `/orchestrate <task>` | Full multi-agent task execution — decompose, plan, branch, execute in waves |
-| `/review [branch or file]` | Multi-agent code review: architectural drift + test coverage + implementation quality |
-| `/release [version]` | Pre-release quality pass — QA, docs, CI/CD check, gated release checklist |
-| `/checkpoint [description]` | Verify docs, run lint/tests, commit WIP before pausing |
 | `/status` | Render a live project health card (tasks, commits, open PRs, blockers) |
 | `/start` | Run project onboarding from `START_HERE.md` |
 | `/sync-template` | Pull latest agent definitions and templates from upstream |
@@ -70,8 +62,8 @@ Project MCP servers are declared in `.mcp.json` (committed to the repo — share
 
 | Server | Purpose | Agents that use it |
 |--------|---------|-------------------|
-| `sequential-thinking` | Structured multi-step reasoning scratchpad | `systems-architect`, `project-manager` |
-| `context7` | Live, version-accurate library documentation | `frontend-developer`, `react-native-developer`, `backend-developer`, `database-expert`, `docker-expert` |
+| `sequential-thinking` | Structured multi-step reasoning scratchpad | `planner` |
+| `context7` | Live, version-accurate library documentation | `builder`, `infra` |
 
 **GitHub integration** — use the `gh` CLI (already authenticated via `gh auth login`). All agents with `Bash` access can run `gh` commands directly. No token configuration needed.
 
@@ -115,17 +107,19 @@ tests/
   e2e/                  # Playwright E2E tests (*.spec.ts)
 docs/
   user/USER_GUIDE.md    # User-facing documentation
-  technical/            # Architecture, API, DB, decisions, design system (DESIGN_SYSTEM.md owned by @ui-ux-designer)
-  content/              # Content strategy, brand voice, keyword targets (owned by @copywriter-seo)
+  technical/            # Architecture, API, DB, decisions, design system (DESIGN_SYSTEM.md owned by @designer)
+  content/              # Content strategy, brand voice, keyword targets (owned by @designer)
 .claude/
   agents/               # Specialist agent definitions
-  commands/             # Slash commands (/orchestrate, /review, /release, /checkpoint, /status, /start, /sync-template)
+  commands/             # Slash commands (/orchestrate, /status, /start, /sync-template)
   hooks/                # Lifecycle hook scripts (guard-destructive, format-on-write, validate-completion, log-agent)
   rules/                # File-scoped rules (typescript, migrations, tests)
+  skills/               # Domain skill files loaded by agents (frontend, backend, database, mobile, etc.)
+  .claude-plugin/       # Plugin manifest — makes skills available when symlinked into ~/.claude/plugins/
   settings.json         # Hook configuration
   templates/            # Blank doc templates (synced from upstream — do not edit)
 .mcp.json               # Project MCP server configuration (shared with team)
-.tasks/                 # Detailed task files — one per TODO item (owned by @project-manager)
+.tasks/                 # Detailed task files — one per TODO item (owned by @planner)
 ```
 
 ---
