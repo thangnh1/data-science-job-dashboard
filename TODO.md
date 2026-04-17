@@ -13,8 +13,6 @@
 
 ## Up Next (prioritized)
 
-- [ ] #002 — Xây dựng ITviec scraper (job title, company, location, salary, description) [area: backend] → [.tasks/002-itviec-scraper.md](.tasks/002-itviec-scraper.md)
-- [ ] #003 — Xây dựng TopCV scraper [area: backend] → [.tasks/003-topcv-scraper.md](.tasks/003-topcv-scraper.md)
 - [ ] #004 — Xây dựng VietnamWorks scraper [area: backend] → [.tasks/004-vietnamworks-scraper.md](.tasks/004-vietnamworks-scraper.md)
 - [ ] #016 — Xây dựng Glints Vietnam scraper (tech-focused, startup & công ty nước ngoài) [area: backend] → [.tasks/016-glints-scraper.md](.tasks/016-glints-scraper.md)
 - [ ] #017 — Xây dựng Vieclam24h scraper (IT entry-level coverage) [area: backend] → [.tasks/017-vieclam24h-scraper.md](.tasks/017-vieclam24h-scraper.md)
@@ -40,6 +38,8 @@
 
 ## Completed
 
+- [x] #003 — Xây dựng TopCV scraper [area: backend] → [.tasks/003-topcv-scraper.md](.tasks/003-topcv-scraper.md)
+- [x] #002 — Xây dựng ITviec scraper (job title, company, location, salary, description) [area: backend] → [.tasks/002-itviec-scraper.md](.tasks/002-itviec-scraper.md)
 - [x] #001 — Thiết kế skill taxonomy cho thị trường IT Việt Nam (keyword groups) [area: backend] → [.tasks/001-skills-taxonomy.md](.tasks/001-skills-taxonomy.md)
 - [x] #000 — Initial project setup and template configuration → [.tasks/000-initial-project-setup.md](.tasks/000-initial-project-setup.md)
 
