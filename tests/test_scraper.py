@@ -300,3 +300,214 @@ def test_save_creates_output_directory(tmp_path: Path) -> None:
 
     assert nested_dir.exists()
     assert Path(output_path).exists()
+
+
+# ===========================================================================
+# TopCV tests
+# ===========================================================================
+
+from src.scrapers.topcv import TopCVScraper  # noqa: E402
+
+_TOPCV_BASE_URL = "https://topcv.vn/tim-viec-lam-it"
+
+
+def _make_topcv_job_card(
+    *,
+    title: str = "Senior Python Developer",
+    company: str = "VN Tech Corp",
+    location: str = "TP.HCM",
+    salary: str | None = "25-35 triệu",
+    description: str = "Build scalable data pipelines.",
+    url: str = "/viec-lam/senior-python-developer-5678",
+    posted_date: str = "2 ngày trước",
+    job_type: str = "Full-time",
+) -> str:
+    """Return an HTML snippet representing a single TopCV job card."""
+    salary_html = f'<div class="salary">{salary}</div>' if salary else ""
+    return f"""
+    <div class="job-item">
+        <h3 class="title">
+            <a href="{url}">{title}</a>
+        </h3>
+        <div class="company">
+            <a href="/company/vntech">{company}</a>
+        </div>
+        <div class="location">{location}</div>
+        {salary_html}
+        <div class="job-description">{description}</div>
+        <span class="posted-date">{posted_date}</span>
+        <label class="job-type">{job_type}</label>
+    </div>
+    """
+
+
+def _wrap_topcv_page(cards_html: str, has_next: bool = False) -> str:
+    """Wrap one or more TopCV card HTML snippets in a minimal page shell."""
+    next_link = (
+        '<a href="/tim-viec-lam-it?page=2" title="Trang kế tiếp">Next</a>'
+        if has_next
+        else ""
+    )
+    return f"""
+    <html><body>
+        <div id="job-list">
+            {cards_html}
+        </div>
+        <nav class="pagination">{next_link}</nav>
+    </body></html>
+    """
+
+
+# ---------------------------------------------------------------------------
+# TopCV Tests
+# ---------------------------------------------------------------------------
+
+
+def test_topcv_instantiation() -> None:
+    """TopCVScraper() creates instance with correct defaults."""
+    scraper = TopCVScraper()
+    assert scraper.max_pages == 20
+    assert scraper.delay == 1.5
+    assert scraper.BASE_URL == "https://topcv.vn/tim-viec-lam-it"
+
+
+@responses_lib.activate
+def test_topcv_parse_job_fields() -> None:
+    """Given a mock HTML page with one job card, all required fields are present."""
+    page_html = _wrap_topcv_page(_make_topcv_job_card())
+    responses_lib.add(responses_lib.GET, _TOPCV_BASE_URL, body=page_html, status=200)
+
+    scraper = TopCVScraper(max_pages=1, delay=0)
+    jobs = scraper.scrape()
+
+    assert len(jobs) == 1
+    job = jobs[0]
+
+    required_keys = {
+        "title",
+        "company",
+        "location",
+        "salary",
+        "description",
+        "url",
+        "posted_date",
+        "job_type",
+        "source",
+        "scraped_at",
+    }
+    assert required_keys == set(
+        job.keys()
+    ), f"Missing keys: {required_keys - set(job.keys())}"
+
+    assert job["title"] == "Senior Python Developer"
+    assert job["company"] == "VN Tech Corp"
+    assert job["location"] == "TP.HCM"
+    assert job["salary"] == "25-35 triệu"
+    assert job["description"] == "Build scalable data pipelines."
+    assert job["url"].startswith("https://topcv.vn")
+    assert job["posted_date"] == "2 ngày trước"
+    assert job["job_type"] == "Full-time"
+    assert job["source"] == "topcv"
+    assert job["scraped_at"]  # non-empty ISO timestamp
+
+
+@responses_lib.activate
+def test_topcv_missing_salary_is_none() -> None:
+    """Job cards without a salary element return None for the salary field."""
+    page_html = _wrap_topcv_page(_make_topcv_job_card(salary=None))
+    responses_lib.add(responses_lib.GET, _TOPCV_BASE_URL, body=page_html, status=200)
+
+    scraper = TopCVScraper(max_pages=1, delay=0)
+    jobs = scraper.scrape()
+
+    assert len(jobs) == 1
+    assert jobs[0]["salary"] is None
+
+
+def test_topcv_save_creates_json_file(tmp_path: Path) -> None:
+    """save() writes a valid JSON file to the given output directory."""
+    scraper = TopCVScraper()
+    sample_jobs = [
+        {
+            "title": "Data Engineer",
+            "company": "VN Data Co",
+            "location": "Hà Nội",
+            "salary": "20-30 triệu",
+            "description": "Build ETL pipelines.",
+            "url": "https://topcv.vn/viec-lam/data-engineer-999",
+            "posted_date": "1 ngày trước",
+            "job_type": "Full-time",
+            "source": "topcv",
+            "scraped_at": "2026-04-18T00:00:00+00:00",
+        }
+    ]
+
+    output_path = scraper.save(sample_jobs, output_dir=str(tmp_path))
+
+    saved_file = Path(output_path)
+    assert saved_file.exists(), "Output file was not created."
+    assert saved_file.suffix == ".json"
+    assert saved_file.name.startswith("topcv_")
+
+    with saved_file.open(encoding="utf-8") as fh:
+        loaded = json.load(fh)
+
+    assert loaded == sample_jobs
+
+
+@responses_lib.activate
+def test_topcv_retry_on_network_error() -> None:
+    """Scraper retries on RequestException and succeeds on the third attempt."""
+    page_html = _wrap_topcv_page(_make_topcv_job_card())
+
+    # First two requests raise a connection error; third succeeds.
+    responses_lib.add(
+        responses_lib.GET,
+        _TOPCV_BASE_URL,
+        body=RequestsConnectionError("Connection refused"),
+    )
+    responses_lib.add(
+        responses_lib.GET,
+        _TOPCV_BASE_URL,
+        body=RequestsConnectionError("Connection refused"),
+    )
+    responses_lib.add(responses_lib.GET, _TOPCV_BASE_URL, body=page_html, status=200)
+
+    scraper = TopCVScraper(max_pages=1, delay=0)
+    import unittest.mock as mock
+
+    with mock.patch("src.scrapers.topcv.time.sleep"):
+        jobs = scraper.scrape()
+
+    assert len(jobs) == 1
+    assert jobs[0]["title"] == "Senior Python Developer"
+
+
+@responses_lib.activate
+def test_topcv_graceful_skip_on_bad_job() -> None:
+    """If one job card fails to parse, the remaining cards are still returned."""
+    good_card = _make_topcv_job_card(title="Good TopCV Job", company="Good Corp VN")
+    bad_card = "<div class='job-item'></div>"
+
+    page_html = _wrap_topcv_page(good_card + bad_card)
+    responses_lib.add(responses_lib.GET, _TOPCV_BASE_URL, body=page_html, status=200)
+
+    original_parse = TopCVScraper._parse_card
+    call_count = 0
+
+    def patched_parse(self, card, scraped_at):
+        nonlocal call_count
+        call_count += 1
+        if call_count == 2:
+            raise ValueError("Simulated parse failure on TopCV card 2")
+        return original_parse(self, card, scraped_at)
+
+    import unittest.mock as mock
+
+    with mock.patch.object(TopCVScraper, "_parse_card", patched_parse):
+        scraper = TopCVScraper(max_pages=1, delay=0)
+        jobs = scraper.scrape()
+
+    # One card succeeded, one was skipped gracefully
+    assert len(jobs) == 1
+    assert jobs[0]["title"] == "Good TopCV Job"
