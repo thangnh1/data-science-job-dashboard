@@ -1,13 +1,13 @@
-# [Project Name] — Claude Instructions
+# VN Tech Job Market Dashboard — Claude Instructions
 
-> Stack: [e.g., Next.js 14 · TypeScript · PostgreSQL · Prisma · Railway]
-> Last updated: [YYYY-MM-DD]
+> Stack: Python 3.11 · Streamlit · Pandas · Plotly · SQLite · Poetry
+> Last updated: 2026-04-18
 
 ## Project Context
 
-[2–3 sentences: what this product does, who it serves, and the core problem it solves.]
+VN Tech Job Market Dashboard phân tích hàng nghìn tin tuyển dụng công nghệ thực tế từ các trang việc làm Việt Nam (ITviec, TopCV, VietnamWorks) để xác định kỹ năng nào được yêu cầu nhiều nhất, mức lương theo vị trí/địa điểm/seniority, và mức độ ảnh hưởng của AI/GenAI đến thị trường lao động IT Việt Nam. Người dùng là lập trình viên, data scientist, và HR tại Việt Nam.
 
-**Tech stack summary**: [Frontend] · [Backend] · [Database] · [Hosting]
+**Tech stack summary**: Streamlit (UI) · Python scripts (scraping + processing) · Pandas/Plotly (analysis) · SQLite (storage) · Poetry (deps)
 
 ---
 
@@ -18,10 +18,10 @@
 | Agent | Role | Invoke when... |
 |-------|------|----------------|
 | `planner` | Backlog & architecture | "What's next?", sprint planning, feature decomposition, tech decisions, ADRs, new feature design before implementation |
-| `builder` | All application code | Frontend components, backend endpoints, database schemas/migrations, React Native screens — specify domain in request |
-| `designer` | UX & content | User flows, wireframes, component specs, accessibility, landing copy, SEO, brand voice, marketing content |
-| `quality` | Testing & documentation | E2E tests, test strategy, coverage gaps, user guide updates, post-feature documentation |
-| `infra` | Infrastructure & pipelines | CI/CD workflows, deployments, Dockerfiles, docker-compose, container configuration |
+| `builder` | All application code | Streamlit pages, scraping scripts, data processing, analysis modules — specify domain in request |
+| `designer` | UX & content | Dashboard layout specs, chart design, color scheme, data visualization choices |
+| `quality` | Testing & documentation | pytest tests, test strategy, coverage gaps, user guide updates |
+| `infra` | Infrastructure & pipelines | CI/CD workflows, Docker, deployment config |
 
 ---
 
@@ -34,17 +34,15 @@ These apply to all agents at all times. No exceptions without explicit human ins
 3. **All commits use Conventional Commits format** (see Git Conventions below).
 4. **Update the relevant `docs/` file** after every significant change before marking a task complete.
 5. **Run tests before marking any implementation task complete.**
-6. **Never hardcode secrets, credentials, or environment-specific values** in source code.
+6. **Never hardcode secrets, credentials, or environment-specific values** in source code. Use `.env` files.
 7. **Consult `docs/technical/DECISIONS.md`** before proposing changes that may conflict with prior architectural decisions.
-8. **Always delegate to the right specialist.** If a task touches application code (frontend, mobile, backend, or database), design/UX/content, testing/documentation, or infrastructure — invoke the appropriate agent (`builder`, `designer`, `quality`, or `infra`) immediately. Do not implement it yourself. The delegation table above is binding, not advisory.
-9. **Commit your own changes; never push.** After completing your work, create a local commit (Conventional Commits format). Do not `git push`. The orchestrator is responsible for pushing the branch and opening the PR.
-10. **When invoking `builder`, specify the domain in your request** (e.g. "frontend task — add dark mode toggle" or "database task — add index on orders table"). The builder reads the corresponding skill before starting work.
+8. **Always delegate to the right specialist.** If a task touches application code, design/UX, testing/documentation, or infrastructure — invoke the appropriate agent immediately. Do not implement it yourself.
+9. **Commit your own changes; never push.** After completing your work, create a local commit (Conventional Commits format). Do not `git push`.
+10. **When invoking `builder`, specify the domain** (e.g. "scraper task — add ITviec scraper" or "dashboard task — add salary analysis page").
 
 ---
 
 ## Slash Commands
-
-Use these commands to trigger common multi-step workflows:
 
 | Command | What it does |
 |---------|--------------|
@@ -57,52 +55,55 @@ Use these commands to trigger common multi-step workflows:
 
 ## MCP Servers
 
-Project MCP servers are declared in `.mcp.json` (committed to the repo — shared by the whole team). No extra credentials required — both servers are unauthenticated.
-
 | Server | Purpose | Agents that use it |
 |--------|---------|-------------------|
 | `sequential-thinking` | Structured multi-step reasoning scratchpad | `planner` |
 | `context7` | Live, version-accurate library documentation | `builder`, `infra` |
-
-**GitHub integration** — use the `gh` CLI (already authenticated via `gh auth login`). All agents with `Bash` access can run `gh` commands directly. No token configuration needed.
-
----
-
-## File-Scoped Rules
-
-Rules in `.claude/rules/` inject context automatically based on the file being edited:
-
-| Rule file | Applied to | Key standards |
-|-----------|-----------|---------------|
-| `typescript.md` | `*.ts`, `*.tsx` | No `any`, no `!` assertions, no `console.log`, explicit return types |
-| `migrations.md` | `*.sql`, `migrations/**` | Reversible migrations, naming convention, no destructive ops without guards |
-| `tests.md` | `*.spec.ts`, `*.test.ts`, `tests/**` | Page Object Model, `data-testid` selectors, no `test.only`, 80% coverage |
 
 ---
 
 ## Project Structure
 
 ```
-src/                    # Application source code
-  app/                  # [e.g., Next.js App Router pages]
-  components/           # Shared UI components
-  lib/                  # Utilities, helpers, shared logic
+src/
+  scrapers/           # Web scrapers for each job board
+    itviec.py         # ITviec.com scraper
+    topcv.py          # TopCV.vn scraper
+    vietnamworks.py   # VietnamWorks.com scraper
+    glints.py         # Glints.com/vn scraper
+    vieclam24h.py     # Vieclam24h.vn scraper
+    job123.py         # 123job.vn scraper
+  processing/         # Data cleaning and skill extraction
+    cleaner.py        # Raw data normalization
+    skill_extractor.py # Keyword-based skill matching
+    salary_parser.py  # Salary range normalization (VND)
+  analysis/           # Analysis modules
+    skills.py         # Skill frequency & ranking
+    salary.py         # Salary statistics
+    location.py       # Geographic distribution
+    ai_impact.py      # AI/GenAI adoption analysis
+  data/               # Skill keyword definitions
+    skills_taxonomy.py  # Vietnamese tech skills keyword groups
+  dashboard/          # Streamlit pages
+    app.py            # Main entry point
+    pages/            # Multi-page Streamlit pages
+      01_skills.py
+      02_salary.py
+      03_location.py
+      04_ai_impact.py
+      05_job_explorer.py
+      06_companies.py
+data/
+  raw/                # Raw scraped data (JSON)
+  processed/          # Cleaned and normalized data
+  db/                 # SQLite database
 tests/
-  e2e/                  # Playwright E2E tests (*.spec.ts)
+  test_scraper.py
+  test_processing.py
+  test_analysis.py
 docs/
-  user/USER_GUIDE.md    # User-facing documentation
-  technical/            # Architecture, API, DB, decisions, design system (DESIGN_SYSTEM.md owned by @designer)
-  content/              # Content strategy, brand voice, keyword targets (owned by @designer)
-.claude/
-  agents/               # Specialist agent definitions
-  commands/             # Slash commands (/orchestrate, /status, /start, /sync-template)
-  rules/                # File-scoped rules (typescript, migrations, tests)
-  skills/               # Domain skill files loaded by agents (frontend, backend, database, mobile, etc.)
-  .claude-plugin/       # Plugin manifest — makes skills available when symlinked into ~/.claude/plugins/
-  settings.json         # Claude Code settings
-  templates/            # Blank doc templates (synced from upstream — do not edit)
-.mcp.json               # Project MCP server configuration (shared with team)
-.tasks/                 # Detailed task files — one per TODO item (owned by @planner)
+  user/USER_GUIDE.md
+  technical/
 ```
 
 ---
@@ -112,87 +113,66 @@ docs/
 ### Commit Format
 ```
 <type>(<scope>): <short description>
-
-[optional body]
-[optional footer: Closes #issue]
 ```
-
-**Types**: `feat` · `fix` · `docs` · `style` · `refactor` · `test` · `chore` · `perf` · `ci`
+**Types**: `feat` · `fix` · `docs` · `refactor` · `test` · `chore` · `perf` · `data`
 
 Examples:
 ```
-feat(auth): add OAuth2 login with Google
-fix(api): handle null response from payment provider
-docs(user-guide): update onboarding section after flow change
+feat(scraper): add ITviec job listing scraper
+feat(dashboard): add salary analysis page
+data(skills): expand AI/ML keyword taxonomy for Vietnamese market
+fix(parser): handle null salary ranges from TopCV
 ```
 
 ### Branch Naming
 ```
 feature/<ticket-id>-short-description
 fix/<ticket-id>-short-description
-chore/<description>
-docs/<description>
-refactor/<description>
+data/<description>
 ```
-
-### PR Requirements
-
-> **Workflow note:** Specialist agents commit locally; the orchestrator pushes and opens the PR.
-
-- PR title follows Conventional Commits format
-- Fill out `.github/PULL_REQUEST_TEMPLATE.md` completely — do not delete sections
-- Link to the related issue/ticket (`Closes #XXX`)
-- At least one reviewer required before merge
-- All CI checks must pass
 
 ---
 
 ## Code Style
 
-> Fill in when project tooling is set up.
-
-- **Language**: TypeScript (strict mode)
-- **Formatter**: [Prettier — config in `.prettierrc`]
-- **Linter**: [ESLint — config in `.eslintrc`]
-- **Import style**: [absolute imports from `src/`]
-- **No `console.log`** in production code — use the project logger utility
-- **No commented-out code** committed — delete it or track it in TODO.md
+- **Language**: Python 3.11+
+- **Formatter**: Black (`black .`)
+- **Linter**: Ruff (`ruff check .`)
+- **Type hints**: Required on all public functions
+- **No `print()`** in production code — use Python `logging` module
+- **No commented-out code** committed — delete it or track in TODO.md
+- **Docstrings**: Google style, only on public functions with non-obvious behavior
 
 ---
 
 ## Testing Conventions
 
-> Fill in when test infrastructure is set up.
-
-- **Unit tests**: [Vitest — colocated as `*.test.ts` next to source files]
-- **E2E tests**: [Playwright — in `tests/e2e/*.spec.ts`]
-- **Run unit**: `[npm test]`
-- **Run E2E**: `[npm run test:e2e]`
-- **Coverage target**: 80% for new features
-- E2E tests use Page Object Model pattern and `data-testid` selectors
+- **Test runner**: pytest
+- **Test location**: `tests/` mirroring `src/` structure
+- **Run tests**: `poetry run pytest`
+- **Run with coverage**: `poetry run pytest --cov=src`
+- **Coverage target**: 70% for new modules
+- Mock external HTTP calls with `responses` or `pytest-httpx`
+- Never make real HTTP requests in tests — use fixture data from `tests/fixtures/`
 
 ---
 
 ## Environment & Commands
 
-> Fill in when project is initialized.
-
-- **Node**: [x.x.x] (see `.nvmrc`)
-- **Package manager**: [npm / pnpm / yarn]
-- `[npm run dev]` — start dev server
-- `[npm run build]` — production build
-- `[npm test]` — unit tests
-- `[npm run test:e2e]` — E2E tests
-- `[npm run lint]` — lint check
-- `[npm run typecheck]` — TypeScript check
+- **Python**: 3.11+ (see `.python-version`)
+- **Package manager**: Poetry
+- `poetry install` — install dependencies
+- `poetry run streamlit run src/dashboard/app.py` — start dashboard
+- `poetry run python src/scrapers/run_all.py` — run all scrapers
+- `poetry run pytest` — run tests
+- `poetry run black .` — format code
+- `poetry run ruff check .` — lint check
 
 ---
 
 ## Key Documentation
 
 @docs/technical/ARCHITECTURE.md
-@docs/technical/DESIGN_SYSTEM.md
 @docs/technical/DECISIONS.md
-@docs/technical/API.md
 @docs/technical/DATABASE.md
 @docs/user/USER_GUIDE.md
