@@ -1,14 +1,14 @@
 ---
 id: "003"
 title: "Xây dựng TopCV scraper"
-status: "in_progress"
+status: "completed"
 area: "backend"
 agent: "@builder"
 priority: "high"
 created_at: "2026-04-18"
 due_date: null
 started_at: "2026-04-18"
-completed_at: null
+completed_at: "2026-04-18"
 prd_refs: ["FR-002", "FR-004", "FR-005"]
 blocks: ["005"]
 blocked_by: ["001"]

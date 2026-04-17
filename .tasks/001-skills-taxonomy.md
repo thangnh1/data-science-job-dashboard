@@ -1,14 +1,14 @@
 ---
 id: "001"
 title: "Thiết kế skill taxonomy cho thị trường IT Việt Nam"
-status: "in_progress"
+status: "completed"
 area: "backend"
 agent: "@builder"
 priority: "high"
 created_at: "2026-04-18"
 due_date: null
 started_at: "2026-04-18"
-completed_at: null
+completed_at: "2026-04-18"
 prd_refs: ["FR-014", "FR-020", "FR-021"]
 blocks: ["005", "008", "009", "011"]
 blocked_by: []
